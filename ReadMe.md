@@ -15,6 +15,31 @@
 
 ## To Do:
 
-    test_selenium.py:
-        only works on sony, have to change to all products
+- test_selenium.py:
+    - key_part parameter should take multiple string, can only take one now
+
+    - need to add exception part
+
+- Loop Try/except for search bar in amazon
+    - sometimes fail to find search bar
+    - reload page, so it may appear in again
+
+
+
+## Done
+
+- Scapper (test_selenium.py) 
+    - Technologies used: Selenium, Xpath, Python
+
+    - get amazon home page > search "product" (parameter) in search bar.
+    - filter results based on "key_part" (parameter 2).
+        - removed case-sensivity, when filtering
+    - get name, price, link in home page and reviews inside each individual page.
+        
+
+    - app.py:
+        - "/form": gets "index.html"
+
+
+    
 

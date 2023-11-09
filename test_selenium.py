@@ -29,7 +29,7 @@ driver = webdriver.Chrome(options=options)
 
 ## Main Code =========================================
 
-def scrape_data(product):
+def scrape_data(product, key_part):
     driver = webdriver.Chrome()
     try:
 
@@ -37,16 +37,19 @@ def scrape_data(product):
         driver.get("https://www.amazon.com/")
         # search box
         driver.find_element(By.XPATH, "//input[@id='twotabsearchtextbox']").send_keys(
-            "sony wf-1000xm4"
+            {product}
         )
         ## click search button
         driver.find_element(By.XPATH, "//input[@id='nav-search-submit-button']").click()
 
         ## Multiple items info, single item: name, price and more link #
-
+        word = key_part
+        
         item_blocks = driver.find_elements(
             By.XPATH,
-            "//text()[contains(., 'Results')]/following::div[@data-index]//text()[contains(., 'WF-1000XM4')]/ancestor-or-self::div[5]",
+            # "//text()[contains(., 'Results')]/following::div[@data-index]//text()[contains(., 'WF-1000XM4')]/ancestor-or-self::div[5]"
+            
+            f"//text()[contains(., 'Results')]/following::div[@data-index]//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.lower()}')]/ancestor-or-self::div[5]"
         )
 
         ## To calculate length of xpaths returned #
@@ -54,18 +57,18 @@ def scrape_data(product):
 
         ## All Data #
         data = []
-
+        
         for item in item_blocks:
             try:
                 item_name = item.find_element(
-                    By.XPATH, ".//text()[contains(., 'Sony')]/parent::node()"
+                    By.XPATH, f".//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.lower()}')]/parent::node()"
                 ).text
                 item_price = item.find_element(
                     By.XPATH, './/descendant::span[@class="a-price-whole"][1]'
                 ).text
                 
                 item_link = item.find_element(
-                    By.XPATH, ".//text()[contains(., 'Sony')]/ancestor-or-self::a[1][@href]"
+                    By.XPATH, f".//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{word.lower()}')]/ancestor-or-self::a[1][@href]"
                 ).get_attribute("href")
                 # print("=================================================================")
                 # print("item_name: ", item_name)
@@ -116,10 +119,8 @@ def scrape_data(product):
                 continue
             i=i+1
 
-        # Define the output JSON file path
         json_file_path = 'output.json'
 
-        # Save the updated dictionary to a JSON file
         with open(json_file_path, 'w') as json_file:
             json.dump(data, json_file, indent=4)    
             
@@ -131,7 +132,7 @@ def scrape_data(product):
     finally:
         driver.quit()
 
-# scrape_data('sony wf-1000xm4')
+# scrape_data('cerave acne foaming cleanser', 'cerave')
 
 # time.sleep(30000)
 # driver.close()
